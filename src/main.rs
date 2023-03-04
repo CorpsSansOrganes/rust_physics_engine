@@ -1,4 +1,6 @@
-type Real = f32;
+use std::ops::MulAssign; // *= overloading
+
+type Real = f32; // Accuracy vs. Percision tradeoff.
 
 struct Vector3 {
     x : Real,
@@ -14,6 +16,20 @@ impl Vector3 {
         self.x = -self.x;
         self.y = -self.y;
         self.z = -self.z;
+    }
+    pub fn magnitude(&self) -> Real {
+        (self.x.powi(2) + self.y.powi(2) + self.z.powi(2)).sqrt()
+    }
+    pub fn normalize(&mut self) {
+        *self *= 1.0 / self.magnitude();
+    }
+}
+
+impl MulAssign<Real> for Vector3 {
+    fn mul_assign(&mut self, rhs: Real) {
+       self.x *= rhs; 
+       self.y *= rhs; 
+       self.z *= rhs; 
     }
 }
 
