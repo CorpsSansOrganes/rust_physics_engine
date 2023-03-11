@@ -14,8 +14,8 @@ impl Particle {
                velocity: Vector3,
                acceleration: Vector3,
                mass: Real) -> Result<Particle, &'static str> {
-        let inverse_mass = if 0.0 == mass {
-            return Err("Mass can't be zero.") 
+        let inverse_mass = if 0.0 >= mass {
+            return Err("Illegal mass.") 
         } else {
             1.0 / mass
         };
@@ -33,13 +33,11 @@ impl Particle {
 
     pub fn integrate(&mut self, duration: Real) {
         /*
-         * Integrates the position of the partical after a given duration,
+         * Integrates the partical's position after a given duration,
          * using Newton-Euler integration method.
          */
 
-        if duration <= 0.0 {
-            panic!();
-        };
+        debug_assert!(duration > 0.0, "Illegal duration"); 
 
         // Update position
         self.position += (self.velocity + self.acceleration * duration * 0.5) * duration;
@@ -68,7 +66,19 @@ mod tests {
 
         let res = Particle::new(position, velocity, acceleration, mass);
         assert!(res.is_err());
-        assert_eq!(res.err(), Some("Mass can't be zero."));
+        assert_eq!(res.err(), Some("Illegal mass."));
+    }
+
+    #[test]
+    fn new_particle_with_negative_mass_test() {
+        let position = Vector3::new(0.0, 0.0, 0.0);
+        let velocity = Vector3::new(0.0, 0.0, 0.0);
+        let acceleration = Vector3::new(0.0, 0.0, 0.0);
+        let mass: Real = -1.0;
+
+        let res = Particle::new(position, velocity, acceleration, mass);
+        assert!(res.is_err());
+        assert_eq!(res.err(), Some("Illegal mass."));
     }
 
     #[test]
@@ -93,16 +103,28 @@ mod tests {
         assert_eq!(res.inverse_mass, 0.0);
     }
 
+    #[should_panic]
     #[test]
-    fn new_particle_with_negative_mass_test() {
-        let position = Vector3::new(0.0, 0.0, 0.0);
+    fn integrate_with_zero_duration() {
+        let position = Vector3::new(1.3, 2.1, -0.3);
         let velocity = Vector3::new(0.0, 0.0, 0.0);
-        let acceleration = Vector3::new(0.0, 0.0, 0.0);
-        let mass: Real = -1.0;
+        let acceleration = Vector3::new(1.243, -3.0, 0.3333);
+        let mass: Real = 3.0;
 
-        let res = Particle::new(position, velocity, acceleration, mass);
-        assert!(res.is_err());
-        assert_eq!(res.err(), Some("Mass can't be zero."));
+        let mut particle = Particle::new(position, velocity, acceleration, mass).unwrap();
+        particle.integrate(0.0);
+    }
+
+    #[should_panic]
+    #[test]
+    fn integrate_with_negative_duration() {
+        let position = Vector3::new(1.3, 2.1, -0.3);
+        let velocity = Vector3::new(0.0, 0.0, 0.0);
+        let acceleration = Vector3::new(1.243, -3.0, 0.3333);
+        let mass: Real = 3.0;
+
+        let mut particle = Particle::new(position, velocity, acceleration, mass).unwrap();
+        particle.integrate(-1.0);
     }
 
     #[ignore]
