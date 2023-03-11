@@ -5,7 +5,8 @@ pub struct Particle {
     position : Vector3,
     velocity : Vector3,
     pub acceleration : Vector3,
-    dump : Real,
+    forces : Vector3,
+    damp : Real,
     inverse_mass : Real,
 }
 impl Particle {
@@ -18,14 +19,39 @@ impl Particle {
         } else {
             1.0 / mass
         };
+        let forces = Vector3::new(0.0, 0.0, 0.0);
 
-        Ok(Particle { position, velocity, acceleration, dump: 0.9, inverse_mass })
+        Ok(Particle { position, velocity, acceleration, forces, damp: 0.9, inverse_mass })
     }
     
     pub fn new_immovable(position: Vector3,
                          velocity: Vector3,
                          acceleration: Vector3) -> Particle {
-        Particle { position, velocity, acceleration, dump: 0.9 ,inverse_mass: 0.0 }
+        let forces = Vector3::new(0.0, 0.0, 0.0);
+        Particle { position, velocity, acceleration, forces, damp: 0.9 ,inverse_mass: 0.0 }
+    }
+
+    pub fn integrate(&mut self, duration: Real) {
+        /*
+         * Integrates the position of the partical after a given duration,
+         * using Newton-Euler integration method.
+         */
+
+        if duration <= 0.0 {
+            panic!();
+        };
+
+        // Update position
+        self.position += (self.velocity + self.acceleration * duration * 0.5) * duration;
+
+        // Work out the acceleration from forces accumlated.
+        let res_acc = self.acceleration + self.forces * self.inverse_mass;
+
+        // Update velocity
+        self.velocity += res_acc * duration;
+
+        // Impose drag
+        self.velocity *= self.damp.powf(duration);
     }
 }
 
@@ -65,5 +91,33 @@ mod tests {
 
         let res = Particle::new_immovable(position, velocity, acceleration);
         assert_eq!(res.inverse_mass, 0.0);
+    }
+
+    #[test]
+    fn new_particle_with_negative_mass_test() {
+        let position = Vector3::new(0.0, 0.0, 0.0);
+        let velocity = Vector3::new(0.0, 0.0, 0.0);
+        let acceleration = Vector3::new(0.0, 0.0, 0.0);
+        let mass: Real = -1.0;
+
+        let res = Particle::new(position, velocity, acceleration, mass);
+        assert!(res.is_err());
+        assert_eq!(res.err(), Some("Mass can't be zero."));
+    }
+
+    #[ignore]
+    #[test]
+    fn integrate_stress_test() {
+        let position = Vector3::new(1.3, 2.1, -0.3);
+        let velocity = Vector3::new(0.0, 0.0, 0.0);
+        let acceleration = Vector3::new(1.243, -3.0, 0.3333);
+        let mass: Real = 3.0;
+
+        let mut particle = Particle::new(position, velocity, acceleration, mass).unwrap();
+
+        let time = 1.0 / 60.0;
+        for _i in 0..100000000 {
+            particle.integrate(time);
+        }
     }
 }
