@@ -6,7 +6,7 @@ use std::ops::SubAssign; // -= overloading
 use std::ops::Sub; // - overloading
 use std::ops::DivAssign; // /= overloading
 use std::ops::Div; // / overloading
-type Real = f32; // Accuracy vs. Percision tradeoff.
+pub type Real = f32; // Accuracy vs. Percision tradeoff.
 
 pub struct Vector3 {
     pub x : Real,

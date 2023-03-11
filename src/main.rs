@@ -1,4 +1,5 @@
 mod vec3;
+mod particle;
 use vec3::Vector3;
 
 fn main() {
