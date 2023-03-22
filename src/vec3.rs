@@ -31,11 +31,26 @@ impl Vector3 {
         // Maybe should handle magnitude < 1?
         *self *= 1.0 / self.magnitude();
     }
+
+    /// Sets x, y, z values to 0.
     pub fn clear(&mut self) {
         self.x = 0.;
         self.y = 0.;
         self.z = 0.;
     }
+
+    /// Computes the dot product, or inner product, two vectors.
+    /// The length of the projection of v on u.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// let v = Vector3::new(1, 0, 0);
+    /// let u = Vector3::new(0, 1, 0);
+    /// let res = v.dot_product(u);
+    ///
+    /// assert_eq!(0, res);
+    /// ```
     pub fn dot_product(&self, rhs: &Vector3) -> Real {
         /*
          * Dot product, aka inner product and scalar product.

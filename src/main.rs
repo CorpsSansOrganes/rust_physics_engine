@@ -14,4 +14,7 @@ fn main() {
 
     v *= 3.0;
     println!("{}, {}, {}", v.x, v.y, v.z);
+
+    let u = Vector3::new(0., -1., 0.);
+    println!("{} dot product", v.dot_product(&u));
 }
