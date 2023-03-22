@@ -36,7 +36,7 @@ impl Particle {
         self.acceleration += Vector3::new(0.0, -10.0, 0.0);
     }
 
-    pub fn add_force(&mut self, force: Vector3) {
+    pub fn add_force(&mut self, force: &Vector3) {
         self.force_accumulator += force;
     }
 

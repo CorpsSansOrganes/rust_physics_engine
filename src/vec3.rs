@@ -43,10 +43,9 @@ impl Vector3 {
         self.x * rhs.x + self.y * rhs.y + self.z * rhs.z
     }
     pub fn cross_product(&self, rhs: &Vector3) -> Vector3 {
-        let x = self.y * rhs.z - self.z * rhs.y;
-        let y = -self.x * rhs.z + self.z * rhs.x;
-        let z = self.x * rhs.y - self.y * rhs.x;
-        Vector3::new(x, y, z)
+        Vector3::new(self.y * rhs.z - self.z * rhs.y,
+                     -self.x * rhs.z + self.z * rhs.x,
+                     self.x * rhs.y - self.y * rhs.x)
     }
 }
 
@@ -87,11 +86,27 @@ impl AddAssign for Vector3 {
        self.z += rhs.z; 
    } 
 }
+
+impl<'a> AddAssign<&'a Vector3> for Vector3 {
+    fn add_assign(&mut self, rhs: &'a Vector3) {
+       self.x += rhs.x; 
+       self.y += rhs.y; 
+       self.z += rhs.z; 
+    }
+}
+
 impl Add for Vector3 {
     type Output = Vector3;
     fn add(self, rhs: Self) -> Self::Output {
         Vector3::new(self.x + rhs.x, self.y + rhs.y, self.z + rhs.z)
     }    
+}
+
+impl<'a> Add<&'a Vector3> for Vector3 {
+    type Output = Vector3;
+    fn add(self, rhs: &'a Vector3) -> Self::Output {
+       Vector3::new(self.x + rhs.x, self.y + rhs.y, self.y + rhs.y) 
+    }
 }
 
 impl SubAssign for Vector3 {
