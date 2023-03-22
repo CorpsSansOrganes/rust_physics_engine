@@ -30,6 +30,11 @@ impl Vector3 {
         // Maybe should handle magnitude < 1?
         *self *= 1.0 / self.magnitude();
     }
+    pub fn clear(&mut self) {
+        self.x = 0.;
+        self.y = 0.;
+        self.z = 0.;
+    }
     pub fn dot_product(&self, rhs: &Vector3) -> Real {
         /*
          * Dot product, aka inner product and scalar product.

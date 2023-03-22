@@ -5,10 +5,11 @@ pub struct Particle {
     position : Vector3,
     velocity : Vector3,
     pub acceleration : Vector3,
-    forces : Vector3,
-    damp : Real,
+    force_accumulator : Vector3,
+    damp : Real, // 0..1 -> % of velocity 
     inverse_mass : Real,
 }
+
 impl Particle {
     pub fn new(position: Vector3,
                velocity: Vector3,
@@ -19,16 +20,24 @@ impl Particle {
         } else {
             1.0 / mass
         };
-        let forces = Vector3::new(0.0, 0.0, 0.0);
+        let force_accumulator = Vector3::new(0.0, 0.0, 0.0);
 
-        Ok(Particle { position, velocity, acceleration, forces, damp: 0.9, inverse_mass })
+        Ok(Particle { position, velocity, acceleration, force_accumulator, damp: 0.9, inverse_mass })
     }
     
     pub fn new_immovable(position: Vector3,
                          velocity: Vector3,
                          acceleration: Vector3) -> Particle {
-        let forces = Vector3::new(0.0, 0.0, 0.0);
-        Particle { position, velocity, acceleration, forces, damp: 0.9 ,inverse_mass: 0.0 }
+        let force_accumulator = Vector3::new(0.0, 0.0, 0.0);
+        Particle { position, velocity, acceleration, force_accumulator, damp: 0.9 ,inverse_mass: 0.0 }
+    }
+
+    pub fn add_gravity(&mut self) {
+        self.acceleration += Vector3::new(0.0, -10.0, 0.0);
+    }
+
+    pub fn add_force(&mut self, force: Vector3) {
+        self.force_accumulator += force;
     }
 
     pub fn integrate(&mut self, duration: Real) {
@@ -43,13 +52,16 @@ impl Particle {
         self.position += (self.velocity + self.acceleration * duration * 0.5) * duration;
 
         // Work out the acceleration from forces accumlated.
-        let res_acc = self.acceleration + self.forces * self.inverse_mass;
+        let res_acc = self.acceleration + self.force_accumulator * self.inverse_mass;
 
         // Update velocity
         self.velocity += res_acc * duration;
 
         // Impose drag
         self.velocity *= self.damp.powf(duration);
+
+        // Clear accumlated forces
+        self.force_accumulator.clear();
     }
 }
 
