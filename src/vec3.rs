@@ -8,6 +8,7 @@ use std::ops::DivAssign; // /= overloading
 use std::ops::Div; // / overloading
 pub type Real = f32; // Accuracy vs. Percision tradeoff.
 
+#[derive(Copy, Clone)]
 pub struct Vector3 {
     pub x : Real,
     pub y : Real,
@@ -46,14 +47,6 @@ impl Vector3 {
         let y = -self.x * rhs.z + self.z * rhs.x;
         let z = self.x * rhs.y - self.y * rhs.x;
         Vector3::new(x, y, z)
-    }
-}
-
-impl Copy for Vector3 { }
-
-impl Clone for Vector3 {
-    fn clone(&self) -> Vector3 {
-        *self
     }
 }
 
